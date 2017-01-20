@@ -320,6 +320,12 @@ static const struct fs_path_config android_files[] = {
      * are NOT included on user builds. */
     { 04750, AID_ROOT,      AID_SHELL,     0, "system/xbin/su" },
     { 06755, AID_ROOT,      AID_ROOT,      0, "system/xbin/procmem" },
+
+    /* the following files are custom for HTC 10 */
+    { 00755, AID_SYSTEM,    AID_RADIO,     CAP_MASK_LONG(CAP_NET_BIND_SERVICE), "system/bin/ims_rtp_daemon" },
+    { 00755, AID_SYSTEM,    AID_SYSTEM,    CAP_MASK_LONG(CAP_NET_BIND_SERVICE), "system/bin/imsdatadaemon" },
+    { 00755, AID_SYSTEM,    AID_SYSTEM,    CAP_MASK_LONG(CAP_NET_BIND_SERVICE), "system/bin/pm-service" },
+    { 00755, AID_BLUETOOTH, AID_BLUETOOTH, CAP_MASK_LONG(CAP_BLOCK_SUSPEND), "system/bin/wcnss_filter" },
     
     /* the following files have enhanced capabilities and ARE included in user builds. */
     { 00550, AID_LOGD,      AID_LOGD,      CAP_MASK_LONG(CAP_SYSLOG) |
