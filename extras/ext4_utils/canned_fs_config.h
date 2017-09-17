@@ -23,4 +23,11 @@ int load_canned_fs_config(const char* fn);
 void canned_fs_config(const char* path, int dir,
                       unsigned* uid, unsigned* gid, unsigned* mode, uint64_t* capabilities);
 
+int load_xtra_canned_fs_config(const char* fn);
+void xtra_canned_fs_config(const char* path, int dir,
+					  unsigned* uid, unsigned* gid, unsigned* mode, uint64_t* capabilities);
+
+void fs_config_plus_xtra(const char* path, int dir,
+					  unsigned* uid, unsigned* gid, unsigned* mode, uint64_t* capabilities);
+
 #endif
