@@ -34,10 +34,6 @@
 #include "sparse_crc32.h"
 #include "sparse_format.h"
 
-#if defined(__CYGWIN__)
-#define USE_MINGW
-#endif
-
 #ifndef USE_MINGW
 #include <sys/mman.h>
 #define O_BINARY 0

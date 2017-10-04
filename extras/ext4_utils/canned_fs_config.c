@@ -107,3 +107,84 @@ void canned_fs_config(const char* path, int dir,
 	if (c_capabilities != *capabilities) printf("%s capabilities %llx %llx\n", path, *capabilities, c_capabilities);
 #endif
 }
+
+
+static Path* xtra_canned_data = NULL;
+static int xtra_canned_alloc = 0;
+static int xtra_canned_used = 0;
+int xtra_fs_configs_applied_count = 0;
+int xtra_fs_configs_removed_caps_count = 0;
+
+int load_xtra_canned_fs_config(const char* fn) {
+	FILE* f = fopen(fn, "r");
+	if (f == NULL) {
+		fprintf(stderr, "failed to open %s: %s\n", fn, strerror(errno));
+		return -1;
+	}
+
+	char line[PATH_MAX + 200];
+	while (fgets(line, sizeof(line), f)) {
+		while (xtra_canned_used >= xtra_canned_alloc) {
+			xtra_canned_alloc = (xtra_canned_alloc+1) * 2;
+			xtra_canned_data = (Path*) realloc(xtra_canned_data, xtra_canned_alloc * sizeof(Path));
+		}
+		Path* p = xtra_canned_data + xtra_canned_used;
+		p->path = strdup(strtok(line, " "));
+		p->uid = atoi(strtok(NULL, " "));
+		p->gid = atoi(strtok(NULL, " "));
+		p->mode = strtol(strtok(NULL, " "), NULL, 8);   // mode is in octal
+		p->capabilities = 0;
+
+		char* token = NULL;
+		do {
+			token = strtok(NULL, " ");
+			if (token && strncmp(token, "capabilities=", 13) == 0) {
+				p->capabilities = strtoll(token+13, NULL, 0);
+				break;
+			}
+		} while (token);
+
+#if 0
+		printf("Xtra_fs_config: %s uid=%d gid=%d mode=0%o capabilities=%llx\n", p->path, p->uid, p->gid, p->mode, p->capabilities);
+#endif
+
+		xtra_canned_used++;
+	}
+
+	fclose(f);
+
+	qsort(xtra_canned_data, xtra_canned_used, sizeof(Path), path_compare);
+	printf("loaded %d Xtra_fs_config entries\n", xtra_canned_used);
+
+	return 0;
+}
+
+void xtra_canned_fs_config(const char* path, int dir,
+					  unsigned* uid, unsigned* gid, unsigned* mode, uint64_t* capabilities) {
+	Path key;
+	key.path = path+1;   // canned paths lack the leading '/'
+	Path* p = (Path*) bsearch(&key, xtra_canned_data, xtra_canned_used, sizeof(Path), path_compare);
+	if (p) {
+#if 0
+		printf("Xtra_fs_config on %s: uid=%d->%d gid=%d->%d mode=0%o->0%o capabilities=0x%llx->0x%llx\n", path,
+		       *uid, p->uid, *gid, p->gid, *mode, p->mode, *capabilities, p->capabilities);
+#endif
+		*uid = p->uid;
+		*gid = p->gid;
+		*mode = p->mode;
+		*capabilities = p->capabilities;
+		++xtra_fs_configs_applied_count;
+	} else if (*capabilities) {
+#if 0
+		printf("Xtra_fs_config removing capabilities on %s: capabilities=0x%llx->0x%llx\n", path, *capabilities, 0);
+#endif
+		*capabilities = 0;
+		++xtra_fs_configs_removed_caps_count;
+	}
+}
+
+void fs_config_plus_xtra(const char* path, int dir,
+					  unsigned* uid, unsigned* gid, unsigned* mode, uint64_t* capabilities) {
+	fs_config(path, dir, uid, gid, mode, capabilities);
+	xtra_canned_fs_config(path, dir, uid, gid, mode, capabilities);
+}
