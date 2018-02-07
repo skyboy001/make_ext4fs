@@ -112,8 +112,8 @@ void canned_fs_config(const char* path, int dir,
 static Path* xtra_canned_data = NULL;
 static int xtra_canned_alloc = 0;
 static int xtra_canned_used = 0;
-int xtra_fs_configs_applied_count = 0;
-int xtra_fs_configs_removed_caps_count = 0;
+int miui_fs_configs_applied_count = 0;
+int miui_fs_configs_removed_caps_count = 0;
 
 int load_xtra_canned_fs_config(const char* fn) {
 	FILE* f = fopen(fn, "r");
@@ -173,13 +173,13 @@ void xtra_canned_fs_config(const char* path, int dir,
 		*gid = p->gid;
 		*mode = p->mode;
 		*capabilities = p->capabilities;
-		++xtra_fs_configs_applied_count;
+		++miui_fs_configs_applied_count;
 	} else if (*capabilities) {
 #if 0
 		printf("Xtra_fs_config removing capabilities on %s: capabilities=0x%llx->0x%llx\n", path, *capabilities, 0);
 #endif
 		*capabilities = 0;
-		++xtra_fs_configs_removed_caps_count;
+		++miui_fs_configs_removed_caps_count;
 	}
 }
 
