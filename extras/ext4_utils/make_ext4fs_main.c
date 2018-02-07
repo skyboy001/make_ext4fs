@@ -55,7 +55,7 @@ static void usage(char *path)
 	fprintf(stderr, "    [ -L <label> ] [ -f ] [ -a <android mountpoint> ]\n");
 	fprintf(stderr, "    [ -S file_contexts ] [ -C fs_config ] [ -T timestamp ]\n");
 	fprintf(stderr, "    [ -z | -s ] [ -w ] [ -c ] [ -J ] [ -v ] [ -B <block_list_file> ]\n");
-	fprintf(stderr, "    [ -X fs_config  (Xtra fs_config will be used in addition to the default android fs props)   ]\n");
+	fprintf(stderr, "    [ -X fs_config  (Miui fs_config will be used in addition to the default android fs props)   ]\n");
 	fprintf(stderr, "    [    Note: all 'capabilities' will be removed from all other files not explicitly specified ]\n");
 	fprintf(stderr, "    <filename> [<directory>]\n");
 }
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 	char *mountpoint = NULL;
 	fs_config_func_t fs_config_func = NULL;
 	const char *fs_config_file = NULL;
-	const char *xtra_fs_config_file = NULL;
+	const char *miui_fs_config_file = NULL;
 	int gzip = 0;
 	int sparse = 0;
 	int crc = 0;
@@ -158,7 +158,7 @@ int main(int argc, char **argv)
 			fs_config_file = optarg;
 			break;
 		case 'X':
-			xtra_fs_config_file = optarg;
+			miui_fs_config_file = optarg;
 			break;
 		case 'B':
 			block_list_file = fopen(optarg, "w");
@@ -185,22 +185,22 @@ int main(int argc, char **argv)
 	}
 #endif
 
-	if (fs_config_file && xtra_fs_config_file) {
+	if (fs_config_file && miui_fs_config_file) {
 		fprintf(stderr, "Cannot specifiy both -C and -X\n");
 		fprintf(stderr, "  It's either: -a (mountpoint) with the optional -X fs_config)\n");
 		fprintf(stderr, "  or -C fs_config\n");
 		usage(argv[0]);
 		exit(EXIT_FAILURE);
-	} else if (!mountpoint && xtra_fs_config_file) {
+	} else if (!mountpoint && miui_fs_config_file) {
 		fprintf(stderr, "Cannot specifiy -X fs_config without -a (mountpoint)\n");
 		usage(argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
 	// don't integrate into original/below code for easier merges
-	if (xtra_fs_config_file) {
-		if (load_xtra_canned_fs_config(xtra_fs_config_file) < 0) {
-			fprintf(stderr, "failed to load %s\n", xtra_fs_config_file);
+	if (miui_fs_config_file) {
+		if (load_xtra_canned_fs_config(miui_fs_config_file) < 0) {
+			fprintf(stderr, "failed to load %s\n", miui_fs_config_file);
 			exit(EXIT_FAILURE);
 		}
 		fs_config_func = fs_config_plus_xtra;

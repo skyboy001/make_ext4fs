@@ -68,8 +68,8 @@
 
 #endif
 
-extern int miui_fs_configs_applied_count;
-extern int miui_fs_configs_removed_caps_count;
+extern int miui_fs_config_applied_count;
+extern int miui_fs_config_removed_caps_count;
 
 /* TODO: Not implemented:
    Allocating blocks in the same block group as the file inode
@@ -642,10 +642,10 @@ int make_ext4fs_internal(int fd, const char *_directory,
 		}
 	}
 
-	if (miui_fs_configs_applied_count)
-		printf("    Number of Xtra_fs_configs that were set: %d\n", miui_fs_configs_applied_count);
-	if (miui_fs_configs_applied_count)
-		printf("    Number of capabilities that were removed: %d\n", miui_fs_configs_removed_caps_count);
+	if (miui_fs_config_applied_count)
+		printf("    Number of Miui_fs_config that were set: %d\n", miui_fs_config_applied_count);
+	if (miui_fs_config_applied_count)
+		printf("    Number of capabilities that were removed: %d\n", miui_fs_config_removed_caps_count);
 
 	printf("Created filesystem with %d/%d inodes and %d/%d blocks\n",
 			aux_info.sb->s_inodes_count - aux_info.sb->s_free_inodes_count,

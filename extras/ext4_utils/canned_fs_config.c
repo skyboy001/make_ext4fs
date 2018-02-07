@@ -112,8 +112,8 @@ void canned_fs_config(const char* path, int dir,
 static Path* xtra_canned_data = NULL;
 static int xtra_canned_alloc = 0;
 static int xtra_canned_used = 0;
-int miui_fs_configs_applied_count = 0;
-int miui_fs_configs_removed_caps_count = 0;
+int miui_fs_config_applied_count = 0;
+int miui_fs_config_removed_caps_count = 0;
 
 int load_xtra_canned_fs_config(const char* fn) {
 	FILE* f = fopen(fn, "r");
@@ -145,7 +145,7 @@ int load_xtra_canned_fs_config(const char* fn) {
 		} while (token);
 
 #if 0
-		printf("Xtra_fs_config: %s uid=%d gid=%d mode=0%o capabilities=%llx\n", p->path, p->uid, p->gid, p->mode, p->capabilities);
+		printf("Miui_fs_config: %s uid=%d gid=%d mode=0%o capabilities=%llx\n", p->path, p->uid, p->gid, p->mode, p->capabilities);
 #endif
 
 		xtra_canned_used++;
@@ -154,7 +154,7 @@ int load_xtra_canned_fs_config(const char* fn) {
 	fclose(f);
 
 	qsort(xtra_canned_data, xtra_canned_used, sizeof(Path), path_compare);
-	printf("loaded %d Xtra_fs_config entries\n", xtra_canned_used);
+	printf("loaded %d Miui_fs_config entries\n", xtra_canned_used);
 
 	return 0;
 }
@@ -166,20 +166,20 @@ void xtra_canned_fs_config(const char* path, int dir,
 	Path* p = (Path*) bsearch(&key, xtra_canned_data, xtra_canned_used, sizeof(Path), path_compare);
 	if (p) {
 #if 0
-		printf("Xtra_fs_config on %s: uid=%d->%d gid=%d->%d mode=0%o->0%o capabilities=0x%llx->0x%llx\n", path,
+		printf("Miui_fs_config on %s: uid=%d->%d gid=%d->%d mode=0%o->0%o capabilities=0x%llx->0x%llx\n", path,
 		       *uid, p->uid, *gid, p->gid, *mode, p->mode, *capabilities, p->capabilities);
 #endif
 		*uid = p->uid;
 		*gid = p->gid;
 		*mode = p->mode;
 		*capabilities = p->capabilities;
-		++miui_fs_configs_applied_count;
+		++miui_fs_config_applied_count;
 	} else if (*capabilities) {
 #if 0
-		printf("Xtra_fs_config removing capabilities on %s: capabilities=0x%llx->0x%llx\n", path, *capabilities, 0);
+		printf("Miui_fs_config removing capabilities on %s: capabilities=0x%llx->0x%llx\n", path, *capabilities, 0);
 #endif
 		*capabilities = 0;
-		++miui_fs_configs_removed_caps_count;
+		++miui_fs_config_removed_caps_count;
 	}
 }
 
